@@ -11,11 +11,13 @@ Item {
 
     ColumnLayout {
         id: mainMenuColumnLayout
+
         anchors.fill: parent
         spacing: 20
 
         Text {
             id: mainTitle
+
             color: "#f3f6f9"
             text: qsTr("Sudoku")
             font.pixelSize: 84
@@ -28,12 +30,14 @@ Item {
 
         ColumnLayout {
             id: mainMenuButtonColumnLayout
+
             Layout.alignment: Qt.AlignCenter
             spacing: 20
             
 
             Button {
                 id: mainMenuNewGameButton
+
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 Layout.preferredHeight: 60
                 Layout.preferredWidth: 236
@@ -49,12 +53,13 @@ Item {
                 }
 
                 onClicked: function(event) {
-                    pageLoader.source = "GameWindow.qml"
+                    pageLoader.source = "LevelSelectionWindow.qml"
                 }
             }
 
             Button {
                 id: mainMenuContinueGameButton
+
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 Layout.preferredHeight: 60
                 Layout.preferredWidth: 236
@@ -73,6 +78,7 @@ Item {
 
             Button {
                 id: mainMenuExitButton
+
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 Layout.preferredHeight: 60
                 Layout.preferredWidth: 236

@@ -9,12 +9,13 @@ find_package(Qt6 6.2 COMPONENTS Quick REQUIRED)
 
 qt_add_executable(appsudoku
     main.cpp
+    sudoku.cpp sudoku.h
 )
 
 qt_add_qml_module(appsudoku
     URI sudoku
     VERSION 1.0
-    QML_FILES qml/main.qml qml/MainMenuWindow.qml qml/GameWindow.qml
+    QML_FILES qml/main.qml qml/MainMenuWindow.qml qml/GameWindow.qml qml/SudokuSquare.qml qml/LevelSelectionWindow.qml
 )
 
 set_target_properties(appsudoku PROPERTIES
