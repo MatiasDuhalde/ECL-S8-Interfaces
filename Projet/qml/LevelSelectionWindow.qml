@@ -48,7 +48,7 @@ Item {
             Repeater {
                 id: levelSelectionRepeater
 
-                model: ["Easy", "Medium", "Hard", "Expert"]
+                model: ["Beginner", "Easy", "Intermediate", "Expert"]
 
                 Button {
                     id: levelSelectionNewGameButton
@@ -66,8 +66,8 @@ Item {
                         radius: 5
                     }
                     onClicked: function(event) {
+                        sudokuObject.initLevel(modelData)
                         pageLoader.source = "GameWindow.qml"
-                        gameWindow.difficulty = modelData
                     }
                 }
             }

@@ -6,6 +6,10 @@ import QtQuick.Controls 2.14
 Item {
     id: gameWindow
 
+    // selected square property
+    property int selectedCase: -1
+
+
     width: 640
     height: 480
 
@@ -29,6 +33,7 @@ Item {
 
                 columnSpacing: 0
                 rowSpacing: 0
+                focus: true
 
                 Repeater {
                     id: sudokuRepeater
@@ -44,6 +49,46 @@ Item {
                             Math.floor(index / 9) == 8 ? 5 : Math.floor(index / 9) % 3 == 2 ? 2.5 : 1,
                             index % 9 == 0 ? 5 : index % 3 == 0 ? 2.5 : 1,
                         ]
+                        value: sudokuObject.getCase(index % 9, Math.floor(index / 9))
+                    }
+                }
+
+                Keys.onReleased: function(event) {
+                    console.log(sudokuObject.qweasd);
+                    if (selectedCase == -1) {
+                        return;
+                    }
+                    switch (event.key) {
+                    case Qt.Key_1:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 1);
+                        break;
+                    case Qt.Key_2:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 2);
+                        break;
+                    case Qt.Key_3:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 3);
+                        break;
+                    case Qt.Key_4:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 4);
+                        break;
+                    case Qt.Key_5:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 5);
+                        break;
+                    case Qt.Key_6:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 6);
+                        break;
+                    case Qt.Key_7:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 7);
+                        break;
+                    case Qt.Key_8:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 8);
+                        break;
+                    case Qt.Key_9:
+                        sudokuObject.setCase(selectedCase % 9, Math.floor(selectedCase / 9), 9);
+                        break;
+                    case Qt.Key_Backspace:
+                        sudokuObject.set(selectedCase % 9, Math.floor(selectedCase / 9), 0);
+                        break;
                     }
                 }
             }

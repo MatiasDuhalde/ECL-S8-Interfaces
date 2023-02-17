@@ -9,7 +9,8 @@ Sudoku::Sudoku(QObject* parent) : QObject{parent} {
   }
 }
 
-Sudoku::Sudoku(const int grid[N][N], QObject* parent) : QObject{parent} {
+Sudoku::Sudoku(const std::array<std::array<int, N>, N> grid, QObject* parent)
+    : QObject{parent} {
   this->init(grid);
 }
 
@@ -25,7 +26,7 @@ Sudoku::Sudoku(const Sudoku& S, QObject* parent) : QObject{parent} {
   }
 }
 
-void Sudoku::init(const int grid[N][N]) {
+void Sudoku::init(const std::array<std::array<int, N>, N> grid) {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       const int val = grid[i][j];
@@ -34,6 +35,23 @@ void Sudoku::init(const int grid[N][N]) {
         fixed[i][j] = true;
       }
     }
+  }
+}
+
+void Sudoku::initLevel(const Levels level) {
+  switch (level) {
+    case Beginner:
+      this->init(this->readFromFile("boards/grilleDebutant.csv"));
+      break;
+    case Easy:
+      this->init(this->readFromFile("boards/grilleFacile.csv"));
+      break;
+    case Intermediate:
+      this->init(this->readFromFile("boards/grilleIntermediaire.csv"));
+      break;
+    case Expert:
+      this->init(this->readFromFile("boards/grilleExpert.csv"));
+      break;
   }
 }
 
@@ -47,7 +65,8 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& S) {
   return os;
 }
 
-Sudoku Sudoku::readFromFile(const std::string& filename, QObject* parent) {
+const std::array<std::array<int, N>, N> Sudoku::readFromFile(
+    const std::string& filename) {
   // Files are in the format
   // .|.|.|.|.|.|.|.|.
   // .|.|.|.|.|.|.|.|.
@@ -61,31 +80,28 @@ Sudoku Sudoku::readFromFile(const std::string& filename, QObject* parent) {
 
   std::ifstream file(filename);
   std::string line;
-  int grid[N][N];
+  std::array<std::array<int, N>, N> grid;
   int i = 0;
   while (std::getline(file, line)) {
     // Ignore lines that are empty or start with a #
     if (line.empty() || line[0] == '#') {
       continue;
     }
-
-    std::istringstream iss(line);
+    // Split the line into tokens
+    std::stringstream ss(line);
+    std::string token;
     int j = 0;
-    for (std::string s; iss >> s;) {
-      // Character . represents an empty cell (0)
-      // Character | is a delimiter
-      if (s == "|") {
-        continue;
-      } else if (s == ".") {
+    while (std::getline(ss, token, '|')) {
+      if (token == ".") {
         grid[i][j] = 0;
       } else {
-        grid[i][j] = std::stoi(s);
+        grid[i][j] = std::stoi(token);
       }
       j++;
     }
     i++;
   }
-  return Sudoku(grid, parent);
+  return grid;
 }
 
 void Sudoku::writeToFile(const std::string& filename) {
@@ -165,13 +181,17 @@ bool Sudoku::isCorrect() {
 
 void Sudoku::set(const int i, const int j, const int val,
                  const bool emitSignal) {
+  std::cout << "set(" << i << ", " << j << ", " << val << ")" << std::endl;
   if (fixed[i][j]) {
     return;
   }
   grid[i][j] = val;
   if (emitSignal) {
-    emit gridChanged(i, j, val);
+    emit caseChanged(i, j);
   }
 }
 
-int Sudoku::get(const int i, const int j) { return grid[i][j]; }
+int Sudoku::get(const int i, const int j) {
+  std::cout << "get(" << i << ", " << j << ")" << std::endl;
+  return grid[i][j];
+}

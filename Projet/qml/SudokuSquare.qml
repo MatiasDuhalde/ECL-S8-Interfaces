@@ -13,30 +13,27 @@ Item {
         false, false, false
     ];
 
+    property bool highlighted: false;
+
     width: size
     height: size
-    focus: true
 
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: function(event) {
-            selectOverlay.opacity = 0.3;
-            // deselect previous
-
-
-        }
-
-    }
-
-    Keys.onReleased: function(event) {
-        switch (event.key) {
-        case Qt.Key_1:
-            console.log(1);
-            break;
-        case Qt.Key_2:
-            console.log(2);
-            break;
+            if (event.button === Qt.LeftButton) {
+                if (gameWindow.selectedCase !== -1) {
+                    sudokuGridLayout.children[gameWindow.selectedCase].highlighted = false;
+                }
+                if (gameWindow.selectedCase === index) {
+                    gameWindow.selectedCase = -1;
+                    highlighted = false;
+                } else {
+                    gameWindow.selectedCase = index;
+                    highlighted = true;
+                }
+            }
         }
     }
 
@@ -116,6 +113,6 @@ Item {
         width: size
         height: size
         color: "white"
-        opacity: 0
+        opacity: highlighted ? 0.3 : 0
     }
 }
