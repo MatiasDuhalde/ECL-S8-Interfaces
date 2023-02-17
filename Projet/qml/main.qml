@@ -1,6 +1,5 @@
 import QtQuick 2.14
-import QtQuick.Layouts 1.14
-import QtQuick.Controls 2.14
+import QtQuick.Dialogs
 
 
 Window {
@@ -16,4 +15,23 @@ Window {
         id: pageLoader
         source: "MainMenuWindow.qml"
     }
+
+    FileDialog {
+        id: fileSelectDialog
+
+        title: "Please choose a save file"
+        currentFolder: Qt.resolvedUrl("./saves")
+        nameFilters: ["*.sudoku.csv"]
+        options: {
+            FileDialog.DontResolveSymlinks |
+            FileDialog.ReadOnly |
+            FileDialog.HideNameFilterDetails
+        }
+        onAccepted: function(event) {
+            console.log("Accepted: " + fileSelectDialog.selectedFile)
+            pageLoader.source = "GameWindow.qml"
+            // pageLoader.item.loadGame(fileSelectDialog.fileUrl)
+        }
+    }
 }
+

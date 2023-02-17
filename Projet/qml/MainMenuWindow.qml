@@ -74,6 +74,10 @@ Item {
                     color: (parent.hovered ? "#90caf9" : "#90caf9")
                     radius: 5
                 }
+
+                onClicked: function(event) {
+                    fileSelectDialog.open();
+                }
             }
 
             Button {
@@ -91,6 +95,10 @@ Item {
                 background: Rectangle {
                     color: "#90caf9"
                     radius: 5
+                }
+
+                onClicked: function(event) {
+                    Qt.quit()
                 }
             }
         }

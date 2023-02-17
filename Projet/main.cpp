@@ -1,12 +1,13 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 #include "sudoku.h"
 
 int main(int argc, char *argv[]) {
   QGuiApplication app(argc, argv);
 
-  // Sudoku *sudoku;
+  Sudoku sudoku;
 
   QQmlApplicationEngine engine;
   const QUrl rootUrl(u"qrc:/sudoku/qml/main.qml"_qs);
@@ -16,7 +17,7 @@ int main(int argc, char *argv[]) {
         if (!obj && rootUrl == objUrl) QCoreApplication::exit(-1);
       },
       Qt::QueuedConnection);
-  // engine.rootContext()->setContextProperty("sudoku", &sudoku);
+  engine.rootContext()->setContextProperty("vueObjetCpt", &sudoku);
   engine.load(rootUrl);
 
   return app.exec();

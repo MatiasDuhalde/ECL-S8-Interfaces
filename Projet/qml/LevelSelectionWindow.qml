@@ -67,6 +67,7 @@ Item {
                     }
                     onClicked: function(event) {
                         pageLoader.source = "GameWindow.qml"
+                        gameWindow.difficulty = modelData
                     }
                 }
             }

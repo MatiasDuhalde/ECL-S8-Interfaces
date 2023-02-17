@@ -1,17 +1,38 @@
 #include "sudoku.h"
 
-Sudoku::Sudoku(int grid[9][9], QObject* parent) : QObject{parent} {
+Sudoku::Sudoku(QObject* parent) : QObject{parent} {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      this->set(i, j, grid[i][j], false);
+      grid[i][j] = 0;
+      fixed[i][j] = false;
     }
   }
+}
+
+Sudoku::Sudoku(const int grid[N][N], QObject* parent) : QObject{parent} {
+  this->init(grid);
 }
 
 Sudoku::Sudoku(const Sudoku& S, QObject* parent) : QObject{parent} {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      this->set(i, j, S.grid[i][j], false);
+      const int val = S.grid[i][j];
+      this->set(i, j, val, false);
+      if (val != 0) {
+        fixed[i][j] = true;
+      }
+    }
+  }
+}
+
+void Sudoku::init(const int grid[N][N]) {
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      const int val = grid[i][j];
+      this->set(i, j, val, false);
+      if (val != 0) {
+        fixed[i][j] = true;
+      }
     }
   }
 }
@@ -26,7 +47,7 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& S) {
   return os;
 }
 
-Sudoku Sudoku::readFromFile(const std::string& filename) {
+Sudoku Sudoku::readFromFile(const std::string& filename, QObject* parent) {
   // Files are in the format
   // .|.|.|.|.|.|.|.|.
   // .|.|.|.|.|.|.|.|.
@@ -64,7 +85,7 @@ Sudoku Sudoku::readFromFile(const std::string& filename) {
     }
     i++;
   }
-  return Sudoku(grid);
+  return Sudoku(grid, parent);
 }
 
 void Sudoku::writeToFile(const std::string& filename) {
@@ -142,11 +163,15 @@ bool Sudoku::isCorrect() {
   return true;
 }
 
-void Sudoku::set(int i, int j, int val, bool emitSignal) {
+void Sudoku::set(const int i, const int j, const int val,
+                 const bool emitSignal) {
+  if (fixed[i][j]) {
+    return;
+  }
   grid[i][j] = val;
   if (emitSignal) {
-    emit gridChanged();
+    emit gridChanged(i, j, val);
   }
 }
 
-int Sudoku::get(int i, int j) { return grid[i][j]; }
+int Sudoku::get(const int i, const int j) { return grid[i][j]; }
