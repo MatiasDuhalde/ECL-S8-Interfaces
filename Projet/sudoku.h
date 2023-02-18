@@ -61,12 +61,12 @@ class Sudoku : public QObject {
   void caseConflictStatusChanged(const int i, const int j, const bool status);
 
  private:
-  std::array<std::array<int, N2>, N2> grid;
+  std::array<std::array<int, N2>, N2> grid = {0};
   std::array<std::array<bool, N2>, N2> fixedCases = {false};
   std::array<std::array<int, N2>, N2> conflictingCases = {0};
   bool isComplete = false;
   bool isCorrect = false;
-  int casesLeft = N2;
+  int casesLeft = N2 * N2;
 };
 
 #endif  // SUDOKU_H

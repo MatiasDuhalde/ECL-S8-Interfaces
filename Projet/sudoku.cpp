@@ -1,14 +1,10 @@
 #include "sudoku.h"
 
+#include <bitset>
+
 #include "sudoku_exception.h"
 
-Sudoku::Sudoku(QObject* parent) : QObject{parent} {
-  for (int i = 0; i < N2; i++) {
-    for (int j = 0; j < N2; j++) {
-      this->setCaseValue(i, j, 0, false);
-    }
-  }
-}
+Sudoku::Sudoku(QObject* parent) : QObject{parent} {}
 
 Sudoku::Sudoku(const std::array<std::array<int, N2>, N2>& initGrid,
                QObject* parent)
@@ -25,6 +21,7 @@ Sudoku::Sudoku(const Levels& level, QObject* parent) : QObject{parent} {
 }
 
 const void Sudoku::init(const std::array<std::array<int, N2>, N2>& initGrid) {
+  this->setCasesLeft(N2 * N2);
   for (int i = 0; i < N2; i++) {
     for (int j = 0; j < N2; j++) {
       this->setCaseFixed(i, j, false);
@@ -134,45 +131,10 @@ const bool Sudoku::checkCorrect(const bool emitSignal) {
     return false;
   }
 
-  // Check rows
   for (int i = 0; i < N2; i++) {
-    bool seen[N2 + 1] = {false};
     for (int j = 0; j < N2; j++) {
-      if (!this->isCaseEmpty(i, j)) {
-        if (seen[grid[i][j]]) {
-          return false;
-        }
-        seen[grid[i][j]] = true;
-      }
-    }
-  }
-
-  // Check columns
-  for (int j = 0; j < N2; j++) {
-    bool seen[N2 + 1] = {false};
-    for (int i = 0; i < N2; i++) {
-      if (!this->isCaseEmpty(i, j)) {
-        if (seen[grid[i][j]]) {
-          return false;
-        }
-        seen[grid[i][j]] = true;
-      }
-    }
-  }
-
-  // Check 3x3 subgrids
-  for (int i = 0; i < N2; i += N) {
-    for (int j = 0; j < N2; j += N) {
-      bool seen[N2 + 1] = {false};
-      for (int k = 0; k < N; k++) {
-        for (int l = 0; l < N; l++) {
-          if (!this->isCaseEmpty(i + k, j + l)) {
-            if (seen[grid[i + k][j + l]]) {
-              return false;
-            }
-            seen[grid[i + k][j + l]] = true;
-          }
-        }
+      if (this->conflictingCases[i][j] != 0) {
+        return false;
       }
     }
   }
@@ -205,9 +167,9 @@ const void Sudoku::checkForConflicts(const int i, const int j,
 
   // Check row conflicts
 
-  int maskRow = 1 << i;
-  int maskCol = 1 << (j + N2);
-  int maskSubGrid = 1 << (i / N * N + j / N + 2 * N2);
+  int maskRow = 1 << j;
+  int maskCol = 1 << (i + N2);
+  int maskSubGrid = 1 << ((i % N) * N + j % N + 2 * N2);
 
   int conflicts = 0;
   for (int k = 0; k < N2; k++) {
@@ -243,7 +205,7 @@ const void Sudoku::checkForConflicts(const int i, const int j,
       int a = subgridI * N + k;
       int b = subgridJ * N + l;
       if (!this->isCaseEmpty(a, b) && (a != i || b != j)) {
-        int mask = 1 << (a * N2 + b + 2 * N2);
+        int mask = 1 << (k * N + b + 2 * N2);
         if (this->getCaseValue(i, j) == this->getCaseValue(a, b)) {
           conflicts |= mask;
           newConflicts[a][b] |= maskSubGrid;
@@ -266,11 +228,8 @@ const void Sudoku::checkForConflicts(const int i, const int j,
         }
         this->conflictingCases[k][l] = newConflicts[k][l];
       }
-      std::cout << this->conflictingCases[k][l] << " ";
     }
-    std::cout << std::endl;
   }
-  std::cout << std::endl;
 }
 
 const void Sudoku::setCaseValue(const int i, const int j, const int value,
@@ -292,6 +251,7 @@ const void Sudoku::setCaseValue(const int i, const int j, const int value,
   if (emitSignal) {
     emit caseChanged(i, j, value);
   }
+
   if (this->isComplete) {
     this->checkCorrect(emitSignal);
   }

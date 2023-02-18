@@ -20,7 +20,7 @@ Window {
         id: fileSelectDialog
 
         title: "Please choose a save file"
-        currentFolder: Qt.resolvedUrl("./saves")
+        currentFolder: "saves"
         nameFilters: ["*.sudoku.csv"]
         options: {
             FileDialog.DontResolveSymlinks |
@@ -30,7 +30,7 @@ Window {
         onAccepted: function(event) {
             const { selectedFile } = fileSelectDialog;
             if (selectedFile) {
-                const filePath = selectedFile.toString().replace("file://", "")
+                const filePath = selectedFile.toString().replace("file://", "");
                 sudokuObject.initFromSaveFile(filePath);
             } else {
                 errorDialog.text = message;
@@ -50,11 +50,10 @@ Window {
         text: "An error has occurred"
     }
 
-
     Connections {
         target: sudokuObject
         function onBoardReady(event) {
-            pageLoader.source = "views/GameWindow.qml"
+            pageLoader.source = "views/LoadedNotice.qml"
         }
 
         function onError(message) {
