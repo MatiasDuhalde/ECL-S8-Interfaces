@@ -62,6 +62,7 @@ Item {
                         ]
                         value: sudokuObject.getCaseValue(Math.floor(index / 9), index % 9)
                         fixed: sudokuObject.isCaseFixed(Math.floor(index / 9), index % 9)
+                        conflict: sudokuObject.isCaseConflicting(Math.floor(index / 9), index % 9)
                     }
                 }
             }

@@ -17,7 +17,7 @@ Sudoku::Sudoku(const Sudoku& S, QObject* parent) : QObject{parent} {
 }
 
 Sudoku::Sudoku(const Levels& level, QObject* parent) : QObject{parent} {
-  this->init(Sudoku::getArrayFromLevel(level));
+  this->initFromLevel(level);
 }
 
 const void Sudoku::init(const std::array<std::array<int, N2>, N2>& initGrid) {
@@ -58,7 +58,23 @@ const void Sudoku::clear() {
 
 const void Sudoku::initFromLevel(const Levels& level) {
   try {
-    this->init(Sudoku::getArrayFromLevel(level));
+    switch (level) {
+      case Levels::Beginner:
+        this->initFromFile("boards/grilleDebutant.csv");
+        break;
+      case Levels::Easy:
+        this->initFromFile("boards/grilleFacile.csv");
+        break;
+      case Levels::Intermediate:
+        this->initFromFile("boards/grilleIntermediaire.csv");
+        break;
+      case Levels::Expert:
+        this->initFromFile("boards/grilleExpert.csv");
+        break;
+      default:
+        throw SudokuException("Invalid level");
+        break;
+    }
     emit this->boardReady();
   } catch (SudokuException& e) {
     std::cerr << e.what() << std::endl;
@@ -68,10 +84,8 @@ const void Sudoku::initFromLevel(const Levels& level) {
 
 const void Sudoku::initFromSaveFile(const QString& filename) {
   try {
-    this->init(Sudoku::readFromFile(filename.toStdString()));
-    if (!this->checkCorrect(false)) {
-      emit this->boardReady();
-    }
+    this->initFromFile(filename.toStdString());
+    emit this->boardReady();
   } catch (SudokuException& e) {
     std::cerr << e.what() << std::endl;
     emit this->error(QString(e.what()));
@@ -87,29 +101,7 @@ const void Sudoku::saveToFile(const QString& filename) const {
   }
 }
 
-const std::array<std::array<int, N2>, N2> Sudoku::getArrayFromLevel(
-    const Levels& level) {
-  switch (level) {
-    case Levels::Beginner:
-      return Sudoku::readFromFile("boards/grilleDebutant.csv");
-      break;
-    case Levels::Easy:
-      return Sudoku::readFromFile("boards/grilleFacile.csv");
-      break;
-    case Levels::Intermediate:
-      return Sudoku::readFromFile("boards/grilleIntermediaire.csv");
-      break;
-    case Levels::Expert:
-      return Sudoku::readFromFile("boards/grilleExpert.csv");
-      break;
-    default:
-      throw SudokuException("Invalid level");
-      break;
-  }
-}
-
-const std::array<std::array<int, N2>, N2> Sudoku::readFromFile(
-    const std::string& filename) {
+const void Sudoku::initFromFile(const std::string& filename) {
   std::ifstream file;
   file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
   try {
@@ -118,6 +110,8 @@ const std::array<std::array<int, N2>, N2> Sudoku::readFromFile(
     std::cerr << "Error while opening file: " << filename << std::endl;
     throw SudokuException("Could not open file");
   }
+
+  bool gridInitialized = false;
 
   std::array<std::array<int, N2>, N2> newGrid;
   std::string line;
@@ -144,19 +138,51 @@ const std::array<std::array<int, N2>, N2> Sudoku::readFromFile(
         }
       }
     }
+
+    this->init(newGrid);
+    gridInitialized = true;
+
+    while (!file.eof()) {
+      std::getline(file, line);
+      if (line.empty() || line[0] == '#') {
+        continue;
+      }
+      for (int i = 0; i < N2; i++) {
+        for (int j = 0; j < N2; j++) {
+          if (line[i * N2 + j] == '1') {
+            this->setCaseFixed(i, j, true);
+          } else if (line[i * N2 + j] == '0') {
+            this->setCaseFixed(i, j, false);
+          } else {
+            throw SudokuException("Invalid file format");
+          }
+        }
+      }
+      break;
+    }
   } catch (const std::invalid_argument& e) {
     std::cerr << "Error while reading file: " << filename << std::endl;
     throw SudokuException("Invalid file format");
   } catch (const std::out_of_range& e) {
     std::cerr << "Error while reading file: " << filename << std::endl;
     throw SudokuException("Invalid file format");
+  } catch (const std::ifstream::failure& e) {
+    if (!gridInitialized) {
+      std::cerr << "Error while reading file: " << filename << std::endl;
+      throw SudokuException("Invalid file format");
+    }
   }
-  return newGrid;
 }
 
 const void Sudoku::writeToFile(const std::string& filename) const {
   std::ofstream file(filename);
-  file << *this;
+  file << *this << std::endl;
+  for (int i = 0; i < N2; i++) {
+    for (int j = 0; j < N2; j++) {
+      file << this->fixedCases[i][j];
+    }
+  }
+  file << std::endl;
 }
 
 const bool Sudoku::checkCorrect(const bool emitSignal) {
@@ -304,6 +330,14 @@ const void Sudoku::setCaseFixed(const int i, const int j, const bool value) {
 
 const bool Sudoku::isCaseEmpty(const int i, const int j) const {
   return (this->getCaseValue(i, j) == 0);
+}
+
+const int Sudoku::getCaseConflicts(const int i, const int j) const {
+  return this->conflictingCases[i][j];
+}
+
+const bool Sudoku::isCaseConflicting(const int i, const int j) const {
+  return this->getCaseConflicts(i, j);
 }
 
 const void Sudoku::setCasesLeft(const int newCasesLeft) {

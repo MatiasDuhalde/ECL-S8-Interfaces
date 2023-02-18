@@ -28,15 +28,13 @@ class Sudoku : public QObject {
   Q_INVOKABLE const void reset(const bool emitSignal = true);
   Q_INVOKABLE const void clear();
 
-  static const std::array<std::array<int, N2>, N2> getArrayFromLevel(
-      const Levels& level);
+  const void getArrayFromLevel(const Levels& level);
 
   Q_INVOKABLE const void initFromLevel(const Levels& level);
   Q_INVOKABLE const void initFromSaveFile(const QString& filename);
   Q_INVOKABLE const void saveToFile(const QString& filename) const;
 
-  static const std::array<std::array<int, N2>, N2> readFromFile(
-      const std::string& filename);
+  const void initFromFile(const std::string& filename);
   const void writeToFile(const std::string& filename) const;
 
   const bool checkCorrect(const bool emitSignal = true);
@@ -49,6 +47,9 @@ class Sudoku : public QObject {
 
   Q_INVOKABLE const bool isCaseFixed(const int i, const int j) const;
   const void setCaseFixed(const int i, const int j, const bool value);
+
+  const int getCaseConflicts(const int i, const int j) const;
+  Q_INVOKABLE const bool isCaseConflicting(const int i, const int j) const;
 
   const bool isCaseEmpty(const int i, const int j) const;
 
