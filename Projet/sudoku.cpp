@@ -21,10 +21,9 @@ Sudoku::Sudoku(const Levels& level, QObject* parent) : QObject{parent} {
 }
 
 const void Sudoku::init(const std::array<std::array<int, N2>, N2>& initGrid) {
-  this->setCasesLeft(N2 * N2);
+  this->clear();
   for (int i = 0; i < N2; i++) {
     for (int j = 0; j < N2; j++) {
-      this->setCaseFixed(i, j, false);
       const int val = initGrid[i][j];
       this->setCaseValue(i, j, val, false);
       if (val != 0) {
@@ -32,6 +31,29 @@ const void Sudoku::init(const std::array<std::array<int, N2>, N2>& initGrid) {
       }
     }
   }
+}
+
+const void Sudoku::reset(const bool emitSignal) {
+  for (int i = 0; i < N2; i++) {
+    for (int j = 0; j < N2; j++) {
+      if (!this->isCaseFixed(i, j)) {
+        this->setCaseValue(i, j, 0, emitSignal);
+      }
+    }
+  }
+}
+
+const void Sudoku::clear() {
+  for (int i = 0; i < N2; i++) {
+    for (int j = 0; j < N2; j++) {
+      this->grid[i][j] = 0;
+      this->fixedCases[i][j] = false;
+      this->conflictingCases[i][j] = 0;
+    }
+  }
+  this->casesLeft = N2 * N2;
+  this->isComplete = false;
+  this->isCorrect = false;
 }
 
 const void Sudoku::initFromLevel(const Levels& level) {
@@ -47,7 +69,18 @@ const void Sudoku::initFromLevel(const Levels& level) {
 const void Sudoku::initFromSaveFile(const QString& filename) {
   try {
     this->init(Sudoku::readFromFile(filename.toStdString()));
-    emit this->boardReady();
+    if (!this->checkCorrect(false)) {
+      emit this->boardReady();
+    }
+  } catch (SudokuException& e) {
+    std::cerr << e.what() << std::endl;
+    emit this->error(QString(e.what()));
+  }
+}
+
+const void Sudoku::saveToFile(const QString& filename) const {
+  try {
+    this->writeToFile(filename.toStdString());
   } catch (SudokuException& e) {
     std::cerr << e.what() << std::endl;
     emit this->error(QString(e.what()));

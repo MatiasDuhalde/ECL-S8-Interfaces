@@ -6,22 +6,35 @@ import "../components" as Components
 Item {
     id: gameWindow
 
-    property int selectedCase: -1
+    signal winSignal(string time)
 
     width: 640
-    height: 480
+    height: 640
     focus: true
+
+    // start time
+    property bool gameActive: true
+    property int selectedCase: -1
+    property bool timeRunning: true
+    property date startTime: new Date()
 
     ColumnLayout {
         id: gameColumnLayout
 
         anchors.fill: parent
-        spacing: 10
+        spacing: 20
+
+        Components.Title {
+            id: mainTitle
+
+            Layout.alignment: Qt.AlignCenter
+        }
 
         RowLayout {
             id: gameCenterRowLayout
 
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            spacing: 20
 
             GridLayout {
                 id: sudokuGridLayout
@@ -52,34 +65,78 @@ Item {
                     }
                 }
             }
-
-            ColumnLayout {
-                id: gameControlColumnLayout
-
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                Components.CustomButton {
-                    id: gameResetButton
-
-                    text: "Return to Menu"
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    onClicked: {
-                        pageLoader.source = "views/MainMenuWindow.qml"
-                    }
-                }
-            }
         }
 
         RowLayout {
             id: gameControlRowLayout
 
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            spacing: 20
+
+            Components.CustomButton {
+                id: gameSaveButton
+
+                text: "Save Game"
+                Layout.alignment: Qt.AlignCenter
+
+                onClicked: {
+                    selectSaveNameDialog.open()
+                }
+            }
+
+            Components.CustomButton {
+                id: gameBackButton
+
+                text: "Return to Menu"
+                Layout.alignment: Qt.AlignCenter
+
+                onClicked: {
+                    pageLoader.source = "views/MainMenuWindow.qml"
+                }
+            }
+
+            Components.CustomButton {
+                id: gameResetButton
+
+                text: "Reset Game"
+                Layout.alignment: Qt.AlignCenter
+
+                onClicked: {
+                    sudokuObject.reset()
+                }
+            }
+
+            Text {
+                id: gameTimerText
+
+                Layout.alignment: Qt.AlignCenter
+                text: qsTr("00:00:00")
+                font.pixelSize: 24
+                font.family: "Arial"
+                font.bold: true
+                color: "#f3f6f9"
+            }
+        }
+    }
+
+    Timer {
+        interval: 900
+        running: timeRunning
+        repeat: true
+        onTriggered: function (event) {
+            const difference = new Date().getTime() - startTime.getTime();
+            let seconds = Math.floor(difference / 1000) % 60;
+            seconds = seconds < 10 ? "0" + seconds : seconds.toString();
+            let minutes = Math.floor(seconds / 60) % 60;
+            minutes = minutes < 10 ? "0" + minutes : minutes.toString();
+            let hours = Math.floor(minutes / 60);
+            hours = hours < 10 ? "0" + hours : hours.toString();
+            gameTimerText.text = qsTr(`${hours}:${minutes}:${seconds}`);
         }
     }
 
     Keys.onReleased: function(event) {
-        if (selectedCase == -1) {
+        if (selectedCase == -1 || !gameActive) {
             return;
         }
         switch (event.key) {
@@ -122,18 +179,24 @@ Item {
         target: sudokuObject
 
         function onCaseChanged(i, j, value) {
-            const element = sudokuRepeater.itemAt(j + i * 9)
+            const element = sudokuRepeater.itemAt(j + i * 9);
             if (element) {
-                element.value = value
-                element.repaint()
+                element.value = value;
+                element.repaint();
             }
         }
 
         function onCaseConflictStatusChanged(i, j, status) {
-            const element = sudokuRepeater.itemAt(j + i * 9)
+            const element = sudokuRepeater.itemAt(j + i * 9);
             if (element) {
-                element.changeConflictStatus(status)
+                element.changeConflictStatus(status);
             }
+        }
+
+        function onCorrect() {
+            timeRunning = false;
+            gameActive = false;
+            winSignal(gameTimerText.text);
         }
     }
 }

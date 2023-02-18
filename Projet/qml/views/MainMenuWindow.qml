@@ -6,8 +6,10 @@ import "../components" as Components
 Item {
     id: mainMenu
 
+    signal winSignal(string time)
+
     width: 640
-    height: 480
+    height: 640
 
     ColumnLayout {
         id: mainMenuColumnLayout

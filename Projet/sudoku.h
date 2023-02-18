@@ -25,12 +25,15 @@ class Sudoku : public QObject {
   Sudoku(const Levels& level, QObject* parent = nullptr);
 
   const void init(const std::array<std::array<int, N2>, N2>& initGrid);
+  Q_INVOKABLE const void reset(const bool emitSignal = true);
+  Q_INVOKABLE const void clear();
 
   static const std::array<std::array<int, N2>, N2> getArrayFromLevel(
       const Levels& level);
 
   Q_INVOKABLE const void initFromLevel(const Levels& level);
   Q_INVOKABLE const void initFromSaveFile(const QString& filename);
+  Q_INVOKABLE const void saveToFile(const QString& filename) const;
 
   static const std::array<std::array<int, N2>, N2> readFromFile(
       const std::string& filename);
@@ -54,11 +57,12 @@ class Sudoku : public QObject {
   friend std::ostream& operator<<(std::ostream& os, const Sudoku& S);
 
  signals:
-  void caseChanged(const int i, const int j, const int value);
-  void correct();
-  void boardReady();
-  void error(const QString& message);
-  void caseConflictStatusChanged(const int i, const int j, const bool status);
+  void caseChanged(const int i, const int j, const int value) const;
+  void correct() const;
+  void boardReady() const;
+  void error(const QString& message) const;
+  void caseConflictStatusChanged(const int i, const int j,
+                                 const bool status) const;
 
  private:
   std::array<std::array<int, N2>, N2> grid = {0};

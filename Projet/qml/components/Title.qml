@@ -1,5 +1,6 @@
 import QtQuick 2.14
 
+
 Text {
     color: "#f3f6f9"
     text: qsTr("Sudoku")

@@ -4,13 +4,17 @@ import "../components" as Components
 
 
 Item {
-    id: loadedNotice
+    id: winWindow
+
+    signal winSignal(string time)
 
     width: 640
-    height: 480
+    height: 640
+
+    property string time: "00:00:00"
 
     ColumnLayout {
-        id: loadedNoticeColumnLayout
+        id: winColumnLayout
 
         anchors.fill: parent
         spacing: 20
@@ -22,31 +26,29 @@ Item {
         }
 
         Text {
-            id: loadedNoticeText
+            id: winText
 
             color: "#f3f6f9"
-            text: qsTr("Game Loaded!")
+            text: qsTr("You have completed the puzzle!")
             font.pixelSize: 32
             Layout.alignment: Qt.AlignCenter
             font.family: "Arial"
             font.bold: true
         }
 
-        Components.CustomButton {
-            id: loadedNoticeStartButton
+        Text {
+            id: winTimeText
 
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 60
-            Layout.preferredWidth: 236
-            text: qsTr("Start")
-
-            onClicked: function(event) {
-                pageLoader.source = "views/GameWindow.qml"
-            }
+            color: "#f3f6f9"
+            text: qsTr(`Your time: ${time}`)
+            font.pixelSize: 24
+            Layout.alignment: Qt.AlignCenter
+            font.family: "Arial"
+            font.bold: true
         }
 
         Components.CustomButton {
-            id: loadedNoticeReturnButton
+            id: winReturnButton
 
             text: "Return to Menu"
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

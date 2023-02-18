@@ -1,12 +1,13 @@
 import QtQuick 2.14
-import QtQuick.Dialogs
+import "dialogs" as Dialogs
+import "components" as Components
 
 
 Window {
     id: rootWindow
 
     width: 640
-    height: 480
+    height: 640
     visible: true
     color: "#0a1929"
     title: qsTr("Sudoku")
@@ -16,44 +17,22 @@ Window {
         source: "views/MainMenuWindow.qml"
     }
 
-    FileDialog {
-        id: fileSelectDialog
-
-        title: "Please choose a save file"
-        currentFolder: "saves"
-        nameFilters: ["*.sudoku.csv"]
-        options: {
-            FileDialog.DontResolveSymlinks |
-            FileDialog.ReadOnly |
-            FileDialog.HideNameFilterDetails
-        }
-        onAccepted: function(event) {
-            const { selectedFile } = fileSelectDialog;
-            if (selectedFile) {
-                const filePath = selectedFile.toString().replace("file://", "");
-                sudokuObject.initFromSaveFile(filePath);
-            } else {
-                errorDialog.text = message;
-                errorDialog.open();
-            }
-        }
-        onRejected: function(event) {
-            errorDialog.text = "No file selected";
-            errorDialog.open();
-        }
+    Dialogs.SelectSaveNameDialog {
+        id: selectSaveNameDialog
     }
 
-    MessageDialog {
-        id: errorDialog
+    Dialogs.SelectFileDialog {
+        id: fileSelectDialog
+    }
 
-        title: "Error"
-        text: "An error has occurred"
+    Dialogs.ErrorDialog {
+        id: errorDialog
     }
 
     Connections {
         target: sudokuObject
         function onBoardReady(event) {
-            pageLoader.source = "views/LoadedNotice.qml"
+            pageLoader.source = "views/LoadedNoticeWindow.qml"
         }
 
         function onError(message) {
@@ -61,5 +40,12 @@ Window {
             errorDialog.open();
         }
     }
-}
 
+    Connections {
+        target: pageLoader.item
+        function onWinSignal(time) {
+            pageLoader.source = "views/WinWindow.qml"
+            pageLoader.item.time = time
+        }
+    }
+}

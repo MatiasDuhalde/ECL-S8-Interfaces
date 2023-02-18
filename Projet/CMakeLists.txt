@@ -22,7 +22,10 @@ qt_add_executable(test
 qt_add_qml_module(appsudoku
     URI sudoku
     VERSION 1.0
-    QML_FILES qml/main.qml qml/views/MainMenuWindow.qml qml/views/GameWindow.qml qml/components/SudokuSquare.qml qml/views/LevelSelectionWindow.qml qml/components/CustomButton.qml qml/components/Title.qml qml/views/LoadedNotice.qml
+    QML_FILES qml/main.qml
+    qml/views/MainMenuWindow.qml qml/views/GameWindow.qml qml/views/LevelSelectionWindow.qml qml/views/LoadedNoticeWindow.qml qml/views/WinWindow.qml
+    qml/components/SudokuSquare.qml qml/components/CustomButton.qml qml/components/Title.qml
+    qml/dialogs/SelectFileDialog.qml qml/dialogs/ErrorDialog.qml qml/dialogs/SelectSaveNameDialog.qml
 )
 
 set_target_properties(appsudoku PROPERTIES

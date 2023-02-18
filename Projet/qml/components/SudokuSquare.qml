@@ -1,5 +1,6 @@
 import QtQuick 2.14
 
+
 Item {
     property real size: 10;
     property string color: "#001e3c";
