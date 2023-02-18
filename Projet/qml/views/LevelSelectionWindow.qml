@@ -1,6 +1,6 @@
 import QtQuick 2.14
 import QtQuick.Layouts 1.14
-import QtQuick.Controls 2.14
+import "../components" as Components
 
 
 Item {
@@ -15,17 +15,11 @@ Item {
         anchors.fill: parent
         spacing: 20
 
-        Text {
+        Components.Title {
             id: mainTitle
 
-            color: "#f3f6f9"
-            text: qsTr("Sudoku")
-            font.pixelSize: 84
             Layout.alignment: Qt.AlignCenter
-            font.family: "Arial"
-            font.bold: true
         }
-
 
         Text {
             id: selectionPrompt
@@ -50,26 +44,29 @@ Item {
 
                 model: ["Beginner", "Easy", "Intermediate", "Expert"]
 
-                Button {
+                Components.CustomButton {
                     id: levelSelectionNewGameButton
 
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.preferredHeight: 60
                     Layout.preferredWidth: 236
                     text: qsTr(modelData)
-                    font.pixelSize: 22
-                    font.family: "Arial"
-                    font.bold: true
-                    // font.color: "#0a1929"
-                    background: Rectangle {
-                        color: "#90caf9"
-                        radius: 5
-                    }
+
                     onClicked: function(event) {
-                        sudokuObject.initLevel(modelData)
-                        pageLoader.source = "GameWindow.qml"
+                        sudokuObject.initFromLevel(index)
                     }
                 }
+            }
+        }
+
+        Components.CustomButton {
+            id: gameResetButton
+
+            text: "Return to Menu"
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            onClicked: {
+                pageLoader.source = "views/MainMenuWindow.qml"
             }
         }
     }

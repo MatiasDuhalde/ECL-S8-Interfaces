@@ -14,11 +14,15 @@ Item {
     ];
 
     property bool highlighted: false;
+    property bool fixed: false;
+    property bool conflict: false;
 
     width: size
     height: size
 
     MouseArea {
+        id: squareMouseArea
+
         anchors.fill: parent
         hoverEnabled: true
         onClicked: function(event) {
@@ -38,6 +42,8 @@ Item {
     }
 
     Canvas {
+        id: squareCanvas
+
         width: size
         height: size
 
@@ -87,7 +93,16 @@ Item {
 
             // value
             if (value > 0) {
-                ctx.font = `bold ${Math.floor(size * 0.9)}px "sans-serif"`;
+                // change color if conflict
+                if (conflict) {
+                    ctx.fillStyle = "red";
+                }
+                if (fixed) {
+                    ctx.font = `bold ${Math.floor(size * 0.9)}px "sans-serif"`;
+                } else {
+                    ctx.font = `${Math.floor(size * 0.9)}px "sans-serif"`;
+                }
+                
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.fillText(value, size / 2, size / 2);
@@ -97,7 +112,7 @@ Item {
                     if (possibleValues[i]) {
                         const x = (i % 3) * size / 3;
                         const y = Math.floor(i / 3) * size / 3;
-                        ctx.font = `bold ${Math.floor(size * 0.3)}px "sans-serif"`;
+                        ctx.font = `${Math.floor(size * 0.3)}px "sans-serif"`;
                         ctx.textAlign = "center";
                         ctx.textBaseline = "middle";
                         ctx.fillText(i + 1, x + size / 6, y + size / 6);
@@ -114,5 +129,16 @@ Item {
         height: size
         color: "white"
         opacity: highlighted ? 0.3 : 0
+    }
+
+    function repaint() {
+        squareCanvas.requestPaint();
+    }
+
+    function changeConflictStatus(status) {
+        if (conflict !== status) {
+            conflict = status;
+            repaint();
+        }
     }
 }

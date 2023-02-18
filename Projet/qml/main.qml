@@ -13,7 +13,7 @@ Window {
 
     Loader {
         id: pageLoader
-        source: "MainMenuWindow.qml"
+        source: "views/MainMenuWindow.qml"
     }
 
     FileDialog {
@@ -28,9 +28,38 @@ Window {
             FileDialog.HideNameFilterDetails
         }
         onAccepted: function(event) {
-            console.log("Accepted: " + fileSelectDialog.selectedFile)
-            pageLoader.source = "GameWindow.qml"
-            // pageLoader.item.loadGame(fileSelectDialog.fileUrl)
+            const { selectedFile } = fileSelectDialog;
+            if (selectedFile) {
+                const filePath = selectedFile.toString().replace("file://", "")
+                sudokuObject.initFromSaveFile(filePath);
+            } else {
+                errorDialog.text = message;
+                errorDialog.open();
+            }
+        }
+        onRejected: function(event) {
+            errorDialog.text = "No file selected";
+            errorDialog.open();
+        }
+    }
+
+    MessageDialog {
+        id: errorDialog
+
+        title: "Error"
+        text: "An error has occurred"
+    }
+
+
+    Connections {
+        target: sudokuObject
+        function onBoardReady(event) {
+            pageLoader.source = "views/GameWindow.qml"
+        }
+
+        function onError(message) {
+            errorDialog.text = message;
+            errorDialog.open();
         }
     }
 }
