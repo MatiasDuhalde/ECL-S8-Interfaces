@@ -1,7 +1,5 @@
 #include "sudoku.h"
 
-#include <bitset>
-
 #include "sudoku_exception.h"
 
 Sudoku::Sudoku(QObject* parent) : QObject{parent} {}
@@ -39,6 +37,7 @@ const void Sudoku::reset(const bool emitSignal) {
       if (!this->isCaseFixed(i, j)) {
         this->setCaseValue(i, j, 0, emitSignal);
       }
+      this->clearPossibleValues(i, j);
     }
   }
 }
@@ -49,6 +48,7 @@ const void Sudoku::clear() {
       this->grid[i][j] = 0;
       this->fixedCases[i][j] = false;
       this->conflictingCases[i][j] = 0;
+      this->possibleValues[i][j] = 0;
     }
   }
   this->casesLeft = N2 * N2;
@@ -219,7 +219,7 @@ const void Sudoku::checkForConflicts(const int i, const int j,
   // next N2 bits from right: subgrid conflicts
 
   // new array of conflicts
-  std::array<std::array<int, N2>, N2> newConflicts;
+  std::array<std::array<std::bitset<3 * N2>, N2>, N2> newConflicts;
   for (int i = 0; i < N2; i++)
     for (int j = 0; j < N2; j++)
       newConflicts[i][j] = this->conflictingCases[i][j];
@@ -302,6 +302,7 @@ const void Sudoku::setCaseValue(const int i, const int j, const int value,
   if (caseWasEmpty && value != 0) {
     // Case was empty, now it is not
     this->setCasesLeft(this->casesLeft - 1);
+    this->clearPossibleValues(i, j);
   } else if (!caseWasEmpty && value == 0) {
     // Case was not empty, now it is
     this->setCasesLeft(this->casesLeft + 1);
@@ -320,6 +321,35 @@ const int Sudoku::getCaseValue(const int i, const int j) const {
   return grid[i][j];
 }
 
+const std::array<bool, N2> Sudoku::getPossibleValues(const int i,
+                                                     const int j) const {
+  std::array<bool, N2> calculatedPossibleValues;
+  for (int k = 0; k < N2; k++) {
+    calculatedPossibleValues[k] = this->possibleValues[i][j][k];
+  }
+  return calculatedPossibleValues;
+}
+
+const void Sudoku::togglePossibleValue(const int i, const int j,
+                                       const int value) {
+  if (!this->isCaseEmpty(i, j) || value == 0) {
+    // Case is not empty, cannot toggle possible values
+    return;
+  }
+  this->possibleValues[i][j][value - 1] =
+      !this->possibleValues[i][j][value - 1];
+  emit possibleValuesChanged(i, j, this->getPossibleValues(i, j));
+}
+
+const void Sudoku::removePossibleValue(const int i, const int j,
+                                       const int value) {
+  this->possibleValues[i][j][value] = false;
+}
+
+const void Sudoku::clearPossibleValues(const int i, const int j) {
+  this->possibleValues[i][j] = 0;
+}
+
 const bool Sudoku::isCaseFixed(const int i, const int j) const {
   return this->fixedCases[i][j];
 }
@@ -332,12 +362,13 @@ const bool Sudoku::isCaseEmpty(const int i, const int j) const {
   return (this->getCaseValue(i, j) == 0);
 }
 
-const int Sudoku::getCaseConflicts(const int i, const int j) const {
+const std::bitset<3 * N2> Sudoku::getCaseConflicts(const int i,
+                                                   const int j) const {
   return this->conflictingCases[i][j];
 }
 
 const bool Sudoku::isCaseConflicting(const int i, const int j) const {
-  return this->getCaseConflicts(i, j);
+  return this->getCaseConflicts(i, j) != 0;
 }
 
 const void Sudoku::setCasesLeft(const int newCasesLeft) {

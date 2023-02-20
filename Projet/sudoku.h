@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <array>
+#include <bitset>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -44,11 +45,18 @@ class Sudoku : public QObject {
   Q_INVOKABLE const int getCaseValue(const int i, const int j) const;
   Q_INVOKABLE const void setCaseValue(const int i, const int j, const int value,
                                       const bool emitSignal = true);
+  Q_INVOKABLE const std::array<bool, N2> getPossibleValues(const int i,
+                                                           const int j) const;
+  Q_INVOKABLE const void togglePossibleValue(const int i, const int j,
+                                             const int value);
+  Q_INVOKABLE const void removePossibleValue(const int i, const int j,
+                                             const int value);
+  Q_INVOKABLE const void clearPossibleValues(const int i, const int j);
 
   Q_INVOKABLE const bool isCaseFixed(const int i, const int j) const;
   const void setCaseFixed(const int i, const int j, const bool value);
 
-  const int getCaseConflicts(const int i, const int j) const;
+  const std::bitset<3 * N2> getCaseConflicts(const int i, const int j) const;
   Q_INVOKABLE const bool isCaseConflicting(const int i, const int j) const;
 
   const bool isCaseEmpty(const int i, const int j) const;
@@ -59,6 +67,8 @@ class Sudoku : public QObject {
 
  signals:
   void caseChanged(const int i, const int j, const int value) const;
+  void possibleValuesChanged(const int i, const int j,
+                             const std::array<bool, N2> possibleValues) const;
   void correct() const;
   void boardReady() const;
   void error(const QString& message) const;
@@ -68,7 +78,8 @@ class Sudoku : public QObject {
  private:
   std::array<std::array<int, N2>, N2> grid = {0};
   std::array<std::array<bool, N2>, N2> fixedCases = {false};
-  std::array<std::array<int, N2>, N2> conflictingCases = {0};
+  std::array<std::array<std::bitset<3 * N2>, N2>, N2> conflictingCases = {0};
+  std::array<std::array<std::bitset<3 * N2>, N2>, N2> possibleValues = {0};
   bool isComplete = false;
   bool isCorrect = false;
   int casesLeft = N2 * N2;
