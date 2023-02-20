@@ -65,6 +65,7 @@ Item {
                             index % 9 == 0 ? 5 : index % 3 == 0 ? 2.5 : 1,
                         ]
                         value: sudokuObject.getCaseValue(Math.floor(index / 9), index % 9)
+                        possibleValues: sudokuObject.getPossibleValues(Math.floor(index / 9), index % 9)
                         fixed: sudokuObject.isCaseFixed(Math.floor(index / 9), index % 9)
                         conflict: sudokuObject.isCaseConflicting(Math.floor(index / 9), index % 9)
                     }

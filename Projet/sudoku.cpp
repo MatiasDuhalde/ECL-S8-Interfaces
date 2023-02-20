@@ -160,6 +160,27 @@ const void Sudoku::initFromFile(const std::string& filename) {
       }
       break;
     }
+
+    while (!file.eof()) {
+      std::getline(file, line);
+      if (line.empty() || line[0] == '#') {
+        continue;
+      }
+      for (int i = 0; i < N2; i++) {
+        for (int j = 0; j < N2; j++) {
+          for (int k = 0; k < N2; k++) {
+            if (line[i * N2 * N2 + j * N2 + k] == '1') {
+              this->possibleValues[i][j][k] = true;
+            } else if (line[i * N2 * N2 + j * N2 + k] == '0') {
+              this->possibleValues[i][j][k] = false;
+            } else {
+              throw SudokuException("Invalid file format");
+            }
+          }
+        }
+      }
+      break;
+    }
   } catch (const std::invalid_argument& e) {
     std::cerr << "Error while reading file: " << filename << std::endl;
     throw SudokuException("Invalid file format");
@@ -180,6 +201,12 @@ const void Sudoku::writeToFile(const std::string& filename) const {
   for (int i = 0; i < N2; i++) {
     for (int j = 0; j < N2; j++) {
       file << this->fixedCases[i][j];
+    }
+  }
+  file << std::endl;
+  for (int i = 0; i < N2; i++) {
+    for (int j = 0; j < N2; j++) {
+      file << this->possibleValues[i][j];
     }
   }
   file << std::endl;
@@ -321,11 +348,10 @@ const int Sudoku::getCaseValue(const int i, const int j) const {
   return grid[i][j];
 }
 
-const std::array<bool, N2> Sudoku::getPossibleValues(const int i,
-                                                     const int j) const {
-  std::array<bool, N2> calculatedPossibleValues;
+const QList<bool> Sudoku::getPossibleValues(const int i, const int j) const {
+  QList<bool> calculatedPossibleValues;
   for (int k = 0; k < N2; k++) {
-    calculatedPossibleValues[k] = this->possibleValues[i][j][k];
+    calculatedPossibleValues.append(this->possibleValues[i][j][k]);
   }
   return calculatedPossibleValues;
 }
@@ -338,26 +364,12 @@ const void Sudoku::togglePossibleValue(const int i, const int j,
   }
   this->possibleValues[i][j][value - 1] =
       !this->possibleValues[i][j][value - 1];
-  this->emitPossibleValuesChanged(i, j, this->getPossibleValues(i, j));
-}
-
-const void Sudoku::emitPossibleValuesChanged(
-    const int i, const int j, const std::array<bool, N2> values) const {
-  // std::array<bool, N2> to QVariant
-  QList<bool> valuesList;
-  for (int k = 0; k < N2; k++) {
-    valuesList.append(values[k]);
-  }
-  emit this->possibleValuesChanged(i, j, valuesList);
-}
-
-const void Sudoku::removePossibleValue(const int i, const int j,
-                                       const int value) {
-  this->possibleValues[i][j][value] = false;
+  emit possibleValuesChanged(i, j, this->getPossibleValues(i, j));
 }
 
 const void Sudoku::clearPossibleValues(const int i, const int j) {
   this->possibleValues[i][j] = 0;
+  emit possibleValuesChanged(i, j, this->getPossibleValues(i, j));
 }
 
 const bool Sudoku::isCaseFixed(const int i, const int j) const {
