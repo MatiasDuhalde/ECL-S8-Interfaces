@@ -165,6 +165,40 @@ Item {
         if (selectedCase == -1 || !gameActive) {
             return;
         }
+        if (event.key == Qt.Key_Space) {
+            placingNote = !placingNote
+            gameNoteButton.text = placingNote ? "Place Value" : "Place Note"
+        }
+        switch (event.key) {
+        case Qt.Key_Left:
+            if (selectedCase % 9 != 0) {
+                highlightCase(selectedCase, false)
+                selectedCase -= 1;
+                highlightCase(selectedCase, true)
+            }
+            break;
+        case Qt.Key_Right:
+            if (selectedCase % 9 != 8) {
+                highlightCase(selectedCase, false)
+                selectedCase += 1;
+                highlightCase(selectedCase, true)
+            }
+            break;
+        case Qt.Key_Up:
+            if (selectedCase > 8) {
+                highlightCase(selectedCase, false)
+                selectedCase -= 9;
+                highlightCase(selectedCase, true)
+            }
+            break;
+        case Qt.Key_Down:
+            if (selectedCase/9 < 8) {
+                highlightCase(selectedCase, false)
+                selectedCase += 9;
+                highlightCase(selectedCase, true)
+            }
+            break;
+        }
         if (placingNote) {
             switch (event.key) {
             case Qt.Key_1:
@@ -235,6 +269,16 @@ Item {
                 sudokuObject.setCaseValue(Math.floor(selectedCase / 9), selectedCase % 9, 0);
                 break;
             }
+        }
+    }
+
+    function highlightCase(caseNumber, value) {
+        if (caseNumber == -1) {
+            return;
+        }
+        const element = sudokuRepeater.itemAt(caseNumber);
+        if (element) {
+            element.highlighted = value;
         }
     }
 
