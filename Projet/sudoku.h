@@ -65,10 +65,14 @@ class Sudoku : public QObject {
 
   friend std::ostream& operator<<(std::ostream& os, const Sudoku& S);
 
+  const void emitPossibleValuesChanged(
+      const int i, const int j,
+      const std::array<bool, N2> possibleValues) const;
+
  signals:
   void caseChanged(const int i, const int j, const int value) const;
   void possibleValuesChanged(const int i, const int j,
-                             const std::array<bool, N2> possibleValues) const;
+                             const QList<bool> possibleValues) const;
   void correct() const;
   void boardReady() const;
   void error(const QString& message) const;

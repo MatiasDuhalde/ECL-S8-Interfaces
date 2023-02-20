@@ -338,7 +338,17 @@ const void Sudoku::togglePossibleValue(const int i, const int j,
   }
   this->possibleValues[i][j][value - 1] =
       !this->possibleValues[i][j][value - 1];
-  emit possibleValuesChanged(i, j, this->getPossibleValues(i, j));
+  this->emitPossibleValuesChanged(i, j, this->getPossibleValues(i, j));
+}
+
+const void Sudoku::emitPossibleValuesChanged(
+    const int i, const int j, const std::array<bool, N2> values) const {
+  // std::array<bool, N2> to QVariant
+  QList<bool> valuesList;
+  for (int k = 0; k < N2; k++) {
+    valuesList.append(values[k]);
+  }
+  emit this->possibleValuesChanged(i, j, valuesList);
 }
 
 const void Sudoku::removePossibleValue(const int i, const int j,
