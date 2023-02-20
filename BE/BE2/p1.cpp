@@ -1,4 +1,4 @@
-#include "DamierStat.cpp"
+#include "DamierStat.h"
 
 int main() {
   damier::DamierStat D1;  // Création du Damier et initialisation des cases à 0

@@ -1,26 +1,8 @@
-#include <iostream>
+#include "DamierDyn.h"
 
 namespace damier {
 
-class DamierDyn {
- private:
-  int n;
-  int m;
-  int default_value;
-  int** tableau;
-
- public:
-  DamierDyn(int a, int b, int val);
-  DamierDyn(const DamierDyn& D);
-  ~DamierDyn();
-  void operator=(const DamierDyn& D);
-  void Init(int val);
-  void Set(int i, int j, int val);
-  void Print();
-  void Redim(int a, int b);
-};
-
-DamierDyn::DamierDyn(int a, int b, int val = 0) {
+DamierDyn::DamierDyn(int a, int b, int val) {
   n = a;
   m = b;
   default_value = val;

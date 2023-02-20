@@ -1,9 +1,10 @@
-#include "DamierDyn.cpp"
+#include "DamierDyn.h"
 
 int main() {
   damier::DamierDyn D1(4, 5);
   D1.Init(7);
   D1.Set(2, 4, -2);
+
   damier::DamierDyn D2(D1);
   D1.Redim(6, 2);
   D2 = D1;
