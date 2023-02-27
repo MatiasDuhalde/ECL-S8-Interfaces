@@ -1,6 +1,6 @@
-#include "DamierDynG.cpp"
+#include "DamierDynG.h"
 
-int main(int argc, char *argv[]) {
+int main() {
   damier::DamierDynG<float> Dfloat(2, 2, 0);
 
   Dfloat.Init(-1.4f);

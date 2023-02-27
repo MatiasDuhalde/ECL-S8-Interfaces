@@ -1,28 +1,6 @@
-#include <iostream>
+#include "DamierDyn.h"
 
 namespace damier {
-
-class DamierDyn {
- private:
-  int n;
-  int m;
-  int default_value;
-  int** tableau;
-
- public:
-  DamierDyn(const int a, const int b, const int val);
-  DamierDyn(const DamierDyn& D);
-  ~DamierDyn();
-  void operator=(const DamierDyn& D);
-  DamierDyn operator+(const DamierDyn& D);
-  void operator+=(const DamierDyn& D);
-  void operator+=(const int val);
-  friend std::ostream& operator<<(std::ostream& os, const DamierDyn& D);
-  void Init(const int val);
-  void Set(const int i, const int j, const int val);
-  void Print();
-  void Redim(const int a, const int b);
-};
 
 DamierDyn::DamierDyn(const int a, const int b, const int val = 0) {
   n = a;
@@ -52,10 +30,12 @@ DamierDyn::~DamierDyn() {
   delete[] tableau;
 }
 
-void DamierDyn::operator=(const DamierDyn& D) {
+DamierDyn& DamierDyn::operator=(const DamierDyn& D) {
   Redim(D.n, D.m);
   for (int i = 0; i < n; i++)
     for (int j = 0; j < m; j++) Set(i, j, D.tableau[i][j]);
+
+  return *this;
 }
 
 DamierDyn DamierDyn::operator+(const DamierDyn& D) {

@@ -1,4 +1,4 @@
-#include "DamierDyn.cpp"
+#include "DamierDyn.h"
 
 int main() {
   damier::DamierDyn D1(5, 5, 3);

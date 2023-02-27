@@ -1,30 +1,6 @@
-#include <iostream>
+#include "DamierDynG.h"
 
 namespace damier {
-
-template <typename T>
-class DamierDynG {
- private:
-  int n;
-  int m;
-  T default_value;
-  T** tableau;
-
- public:
-  DamierDynG(int a, int b, const T val);
-  DamierDynG(const DamierDynG<T>& D);
-  ~DamierDynG();
-  void operator=(const DamierDynG<T>& D);
-  DamierDynG<T> operator+(const DamierDynG<T>& D);
-  void operator+=(const DamierDynG<T>& D);
-  void operator+=(const T val);
-  template <typename U>
-  friend std::ostream& operator<<(std::ostream& os, const DamierDynG<U>& D);
-  void Init(const T val);
-  void Set(int i, int j, const T val);
-  void Print();
-  void Redim(int a, int b);
-};
 
 template <typename T>
 DamierDynG<T>::DamierDynG(const int a, const int b, const T val) {
@@ -58,15 +34,17 @@ DamierDynG<T>::~DamierDynG() {
 }
 
 template <typename T>
-void DamierDynG<T>::operator=(const DamierDynG& D) {
+DamierDynG<T>& DamierDynG<T>::operator=(const DamierDynG& D) {
   Redim(D.n, D.m);
   for (int i = 0; i < n; i++)
     for (int j = 0; j < m; j++) Set(i, j, D.tableau[i][j]);
+
+  return *this;
 }
 
 template <typename T>
 DamierDynG<T> DamierDynG<T>::operator+(const DamierDynG& D) {
-  DamierDynG D2(n, m);
+  DamierDynG D2(n, m, default_value);
   for (int i = 0; i < n; i++)
     for (int j = 0; j < m; j++) D2.Set(i, j, tableau[i][j] + D.tableau[i][j]);
   return D2;
@@ -116,7 +94,7 @@ void DamierDynG<T>::Print() {
 
 template <typename T>
 void DamierDynG<T>::Redim(const int a, const int b) {
-  int** tableau2 = new T*[a];
+  T** tableau2 = new T*[a];
   for (int i = 0; i < a; i++) {
     tableau2[i] = new T[b];
     for (int j = 0; j < b; j++) {
@@ -134,5 +112,18 @@ void DamierDynG<T>::Redim(const int a, const int b) {
   n = a;
   m = b;
 }
+
+template class DamierDynG<int>;
+template std::ostream& operator<<(std::ostream& os, const DamierDynG<int>& D);
+
+template class DamierDynG<double>;
+template std::ostream& operator<<(std::ostream& os,
+                                  const DamierDynG<double>& D);
+
+template class DamierDynG<float>;
+template std::ostream& operator<<(std::ostream& os, const DamierDynG<float>& D);
+
+template class DamierDynG<bool>;
+template std::ostream& operator<<(std::ostream& os, const DamierDynG<bool>& D);
 
 }  // namespace damier

@@ -1,6 +1,6 @@
 #include <iomanip>
 
-#include "DamierDynG.cpp"
+#include "DamierDynG.h"
 
 int main(int argc, char *argv[]) {
   damier::DamierDynG<bool> Dbool(3, 4, false);
