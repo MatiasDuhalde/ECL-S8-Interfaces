@@ -1,20 +1,18 @@
-
+#include "ExceptionDamier.h"
 
 namespace damier {
-class ExceptionDamier {
- private:
-  /* data */
- public:
-  ExceptionDamier(/* args */);
-  ~ExceptionDamier();
-};
 
-ExceptionDamier::ExceptionDamier(/* args */){__PRETTY_FUNCTION__
-
+ExceptionDamier::ExceptionDamier(std::string msg) : std::exception() {
+  this->answer += __PRETTY_FUNCTION__;
+  this->answer += " : ";
+  this->answer += msg;
 }
 
 ExceptionDamier::~ExceptionDamier() {}
 
-}  // namespace damier
+const char* ExceptionDamier::what() {
+  std::cerr << this->answer << std::endl;
+  return this->answer.c_str();
+}
 
-// ExceptionDamier.h: interface for the CExceptionDamier class.
+}  // namespace damier
