@@ -66,15 +66,19 @@ std::ostream& operator<<(std::ostream& os, const DamierExc& D) {
 }
 
 void DamierExc::Init(const int val) throw() {
-  if (val > default_value) throw damier::ExceptionDamier("Value too high");
+  if (val > default_value)
+    throw damier::ExceptionDamier(default_value, val, __FILE__,
+                                  __PRETTY_FUNCTION__);
   for (int i = 0; i < n; i++)
     for (int j = 0; j < m; j++) Set(i, j, val);
 }
 
 void DamierExc::Set(const int i, const int j, const int val) throw() {
   if (i < 0 || i >= n || j < 0 || j >= m)
-    throw damier::ExceptionDamier("Index out of range");
-  if (val > default_value) damier::ExceptionDamier("Value too high");
+    throw damier::ExceptionDamier(default_value, val, __FILE__,
+                                  __PRETTY_FUNCTION__);
+  if (val > default_value)
+    damier::ExceptionDamier(default_value, val, __FILE__, __PRETTY_FUNCTION__);
   tableau[i][j] = val;
 }
 
