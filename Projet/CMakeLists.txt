@@ -7,6 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.2 COMPONENTS Quick REQUIRED)
 
+file(GLOB BOARDS "${CMAKE_CURRENT_SOURCE_DIR}/boards/*.csv")
+file(GLOB SAVES "${CMAKE_CURRENT_SOURCE_DIR}/saves/*.csv")
+
+file(COPY ${BOARDS}
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/boards)
+file(COPY ${SAVES}
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/saves)
+
 qt_add_executable(appsudoku
     main.cpp
     sudoku.cpp sudoku.h

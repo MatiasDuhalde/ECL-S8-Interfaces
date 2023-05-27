@@ -75,8 +75,6 @@ CMakeLists.txt.user*
 *.exe
 
 
-
 saves/
-boards/
 
 .vscode/

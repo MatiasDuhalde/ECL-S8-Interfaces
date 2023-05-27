@@ -59,10 +59,10 @@ Item {
                         color: "#001e3c"
                         borderColor: "#5090d3";
                         borders: [
-                            Math.floor(index / 9) == 0 ? 5 : Math.floor(index / 9) % 3 == 0 ? 2.5 : 1,
-                            index % 9 == 8 ? 5 : index % 3 == 2 ? 2.5 : 1,
-                            Math.floor(index / 9) == 8 ? 5 : Math.floor(index / 9) % 3 == 2 ? 2.5 : 1,
-                            index % 9 == 0 ? 5 : index % 3 == 0 ? 2.5 : 1,
+                            Math.floor(index / 9) === 0 ? 5 : Math.floor(index / 9) % 3 === 0 ? 2.5 : 1,
+                            index % 9 === 8 ? 5 : index % 3 === 2 ? 2.5 : 1,
+                            Math.floor(index / 9) === 8 ? 5 : Math.floor(index / 9) % 3 === 2 ? 2.5 : 1,
+                            index % 9 === 0 ? 5 : index % 3 === 0 ? 2.5 : 1,
                         ]
                         value: sudokuObject.getCaseValue(Math.floor(index / 9), index % 9)
                         possibleValues: sudokuObject.getPossibleValues(Math.floor(index / 9), index % 9)
@@ -162,23 +162,23 @@ Item {
     }
 
     Keys.onReleased: function(event) {
-        if (selectedCase == -1 || !gameActive) {
+        if (selectedCase === -1 || !gameActive) {
             return;
         }
-        if (event.key == Qt.Key_Space) {
+        if (event.key === Qt.Key_Space) {
             placingNote = !placingNote
             gameNoteButton.text = placingNote ? "Place Value" : "Place Note"
         }
         switch (event.key) {
         case Qt.Key_Left:
-            if (selectedCase % 9 != 0) {
+            if (selectedCase % 9 !== 0) {
                 highlightCase(selectedCase, false)
                 selectedCase -= 1;
                 highlightCase(selectedCase, true)
             }
             break;
         case Qt.Key_Right:
-            if (selectedCase % 9 != 8) {
+            if (selectedCase % 9 !== 8) {
                 highlightCase(selectedCase, false)
                 selectedCase += 1;
                 highlightCase(selectedCase, true)
@@ -273,7 +273,7 @@ Item {
     }
 
     function highlightCase(caseNumber, value) {
-        if (caseNumber == -1) {
+        if (caseNumber === -1) {
             return;
         }
         const element = sudokuRepeater.itemAt(caseNumber);
